@@ -1,2 +1,42 @@
+html_code = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CivicPulse - Report Issue</title>
+</head>
+<body>
+    <h2>Report a Civic Issue</h2>
+    <form id="reportForm">
+        <label for="user_input">Describe the issue:</label><br>
+        <textarea id="user_input" rows="5" cols="60" placeholder="E.g., Garbage not collected in Sector 14 for 3 days"></textarea><br><br>
+        <button type="submit">Submit</button>
+    </form>
 
-<!-- Your full HTML code here -->
+    <h3>AI Response:</h3>
+    <div id="response" style="white-space: pre-wrap; border: 1px solid #ccc; padding: 10px;"></div>
+
+    <script>
+        document.getElementById("reportForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const userInput = document.getElementById("user_input").value;
+
+            const response = await fetch("/report", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ user_input: userInput })
+            });
+
+            const data = await response.json();
+            document.getElementById("response").textContent = data.response;
+        });
+    </script>
+</body>
+</html>
+"""
+
+with open("templates/index.html", "w") as f:
+    f.write(html_code)
+
+print("✅ index.html created successfully.")
