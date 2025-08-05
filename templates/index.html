@@ -3,110 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <title>CivicPulse - Report Issue</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
     <style>
         body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px;
             margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            background: #f4f7fa;
-            color: #333;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 60px auto;
-            background: #fff;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
         h2 {
-            margin-bottom: 20px;
-            font-size: 26px;
-            font-weight: 600;
-            color: #2c3e50;
+            color: #58a6ff;
         }
 
-        label {
-            font-weight: 500;
-            font-size: 16px;
+        form {
+            background-color: #161b22;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(88, 166, 255, 0.2);
+            max-width: 600px;
         }
 
         textarea {
             width: 100%;
-            font-size: 16px;
-            margin-top: 8px;
-            padding: 14px;
-            border: 1.5px solid #ccc;
+            background-color: #0d1117;
+            color: #ffffff;
+            border: 1px solid #30363d;
             border-radius: 8px;
+            padding: 10px;
+            font-size: 16px;
             resize: vertical;
-            font-family: 'Inter', sans-serif;
-            box-sizing: border-box;
         }
 
         button {
-            margin-top: 20px;
-            background-color: #007bff;
+            background-color: #238636;
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 10px 20px;
+            margin-top: 15px;
             font-size: 16px;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #2ea043;
         }
 
-        h3 {
+        #reportOutput {
             margin-top: 40px;
-            font-size: 22px;
-            color: #34495e;
+            background-color: #161b22;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid #58a6ff;
+            white-space: pre-wrap;
+            max-width: 600px;
         }
 
-        #response {
-            margin-top: 10px;
-            border: 1.5px solid #ccc;
-            border-radius: 8px;
-            padding: 18px;
-            background: #fdfdfd;
-            font-size: 16px;
-            min-height: 60px;
+        .loading {
+            color: #8b949e;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>CivicPulse - Report a Civic Issue</h2>
-        <form id="reportForm">
-            <label for="user_input">Describe the issue:</label><br>
-            <textarea id="user_input" rows="5" placeholder="E.g., Garbage not collected in Sector 14 for 3 days"></textarea><br>
-            <button type="submit">Submit</button>
-        </form>
 
-        <h3>AI Response:</h3>
-        <div id="response"></div>
-    </div>
+    <h2>🧭 CivicPulse - Report a Civic Issue</h2>
+
+    <form id="reportForm">
+        <label for="user_input">📝 Describe the issue:</label><br><br>
+        <textarea id="user_input" rows="5" placeholder="E.g., Garbage not collected in Sector 14 for 3 days"></textarea><br><br>
+        <button type="submit">🚀 Submit Report</button>
+    </form>
+
+    <div id="reportOutput"></div>
 
     <script>
-        document.getElementById("reportForm").addEventListener("submit", async function(e) {
+        document.getElementById("reportForm").addEventListener("submit", async function (e) {
             e.preventDefault();
             const userInput = document.getElementById("user_input").value.trim();
+            const output = document.getElementById("reportOutput");
 
             if (!userInput) {
-                document.getElementById("response").textContent = "Please describe the issue before submitting.";
+                output.innerHTML = "⚠️ Please describe the issue before submitting.";
                 return;
             }
 
-            document.getElementById("response").textContent = "Processing...";
+            output.innerHTML = "<span class='loading'>⏳ Analyzing your report...</span>";
 
             try {
                 const response = await fetch("/report", {
@@ -118,12 +101,19 @@
                 });
 
                 const data = await response.json();
-                document.getElementById("response").textContent = data.response;
+
+                const formatted = data.response
+                    .replace(/- /g, "• ")
+                    .replace("Summary:", "📋 Report Summary:\n• Summary:")
+                    .replace("Possible cause:", "• Possible Cause:")
+                    .replace("Recommended authority:", "• Recommended Authority:");
+
+                output.textContent = formatted;
             } catch (error) {
-                document.getElementById("response").textContent = "Error submitting report. Please try again later.";
-                console.error(error);
+                output.innerHTML = "❌ Error analyzing issue. Please try again later.";
             }
         });
     </script>
+
 </body>
 </html>
