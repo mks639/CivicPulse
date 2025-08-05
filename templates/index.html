@@ -2,58 +2,128 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CivicPulse – Report a Civic Issue</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link 
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
-        rel="stylesheet"
-    >
+    <title>CivicPulse - Report Issue</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
     <style>
         body {
-            background-color: #f8f9fa;
-            padding-top: 40px;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: #f4f7fa;
+            color: #333;
         }
+
         .container {
             max-width: 700px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 26px;
+            font-weight: 600;
+            color: #2c3e50;
         }
-        .ai-response-box {
-            white-space: pre-wrap;
-            background: #f1f1f1;
-            border: 1px solid #ccc;
-            padding: 15px;
-            border-radius: 6px;
+
+        label {
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        textarea {
+            width: 100%;
+            font-size: 16px;
+            margin-top: 8px;
+            padding: 14px;
+            border: 1.5px solid #ccc;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+
+        button {
             margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h3 {
+            margin-top: 40px;
+            font-size: 22px;
+            color: #34495e;
+        }
+
+        #response {
+            margin-top: 10px;
+            border: 1.5px solid #ccc;
+            border-radius: 8px;
+            padding: 18px;
+            background: #fdfdfd;
+            font-size: 16px;
+            min-height: 60px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1 class="display-5">🧠 CivicPulse</h1>
-            <p class="text-muted">AI-powered Civic Issue Reporter</p>
-        </div>
-
-        <form method="post">
-            <div class="mb-3">
-                <label for="prompt" class="form-label"><strong>Describe the Issue</strong></label>
-                <textarea class="form-control" id="prompt" name="prompt" rows="4" 
-                          placeholder="E.g., Garbage not collected in Sector 14 for 3 days" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">🚀 Submit</button>
+        <h2>CivicPulse - Report a Civic Issue</h2>
+        <form id="reportForm">
+            <label for="user_input">Describe the issue:</label><br>
+            <textarea id="user_input" rows="5" placeholder="E.g., Garbage not collected in Sector 14 for 3 days"></textarea><br>
+            <button type="submit">Submit</button>
         </form>
 
-        {% if response %}
-        <div class="mt-5">
-            <h5><strong>✅ AI Response:</strong></h5>
-            <div class="ai-response-box">{{ response }}</div>
-        </div>
-        {% endif %}
+        <h3>AI Response:</h3>
+        <div id="response"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById("reportForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const userInput = document.getElementById("user_input").value.trim();
+
+            if (!userInput) {
+                document.getElementById("response").textContent = "Please describe the issue before submitting.";
+                return;
+            }
+
+            document.getElementById("response").textContent = "Processing...";
+
+            try {
+                const response = await fetch("/report", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ user_input: userInput })
+                });
+
+                const data = await response.json();
+                document.getElementById("response").textContent = data.response;
+            } catch (error) {
+                document.getElementById("response").textContent = "Error submitting report. Please try again later.";
+                console.error(error);
+            }
+        });
+    </script>
 </body>
 </html>
